@@ -1,0 +1,23 @@
+Logic Probe and Pulse generator:
+
+Date: 1992.
+ICs: LM339 & 555.
+Wiring:
+
+        Red Clip        +Vcc
+        Black Clip      Ground
+        Probe Tip       Test Input / Pulse Train Output
+
+Indicators:
+
+        Red     Logical High
+        Green   Logical Low
+
+        Piezo Transducer
+
+Switches:
+        Momentary On    Force High
+        Momentary On    Force Low
+        DPDT            Positions: 1 Test Input
+                                   2 Pulse Train Output
+

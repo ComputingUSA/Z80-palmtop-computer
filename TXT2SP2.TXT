@@ -1,0 +1,42 @@
+Text to Speech Processor:
+
+Date: 1991.
+ICs: SP0256-AL2, CTS256A-AL2, & 6116-10 SRAM.
+Pinout:
+
+                1 D3       9 D4                 3mm Mono Socket:        1 LM386 Audio Out
+                2 D2      10 D5                                         2 Ground
+                3 D1      11 D6
+                4 D0      12 D7
+                5 Busy    13 Strobe
+                6 +5v     14 Audio Out
+                7 Rx Data 15 Tx Data
+                8 Ground  16 CTS
+
+Wiring:
+        Black   Ground
+        Red     +5v to +30v
+
+Indicators:
+        Red/Green       Buffer Full
+        Yellow          SP0256 Internal Busy Line
+        Red             Rx Data Line Monitor
+        Small Green     Power
+
+Switches:
+        Momentary On    Reset
+
+        DIP:    1 \
+                2  >    RS232 Baud Select
+                3 /
+                4       RAM Buffer Size
+                5       Phrase Delimiter Select
+                6 \     UART Word Size
+                7 /
+                8       Parity Enable
+                9       Even/Odd Parity
+               10       One/Two Stop Bits
+
+        Black Potentiometer     Audio Volume
+        Red Potentiometer       Amplifer (LM386) Parameters
+

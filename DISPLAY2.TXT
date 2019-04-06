@@ -1,0 +1,17 @@
+6 digit 7-segment display with Multiplexer controller circuitry:
+
+Date: 01/03/93.
+ICs: Disrete TTL. 7447 7-segment font.
+Wiring:
+                Color   Function
+
+                Green   Ground
+                Blue    D0  \
+                Purple  D3   \ These are data lines
+                Grey    D1   /
+                White   D2  /
+                Black   A2  \
+                Brown   A1   > These lines select the display digit (1 of 6)
+                Red     A0  /
+                Orange  +5v    Power Supply Input
+

@@ -1,0 +1,19 @@
+32x16 Pixel LED Display:
+
+Date: 1990.
+ICs: Discrete TTL.
+Wiring:
+
+        Black   Ground
+        White   +5v Power In
+
+        1       Y3
+        2       Y2
+        3       Y1
+        4       Y0
+        5       X4
+        6       X3
+        7       X2
+        8       X1
+        9       X0
+

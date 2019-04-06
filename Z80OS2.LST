@@ -1,0 +1,544 @@
+000001 0000                          .org 0
+000002 0000 31FFFF           start:  ld sp, h'FFFF           ; stack at $ffff
+000003 0003                  
+000004 0003 3EFF                     ld a,h'FF
+000005 0005 CDD701                   call wait
+000006 0008                  
+000007 0008 3E88                     ld a,h'88               ; init 8255 to all output except c4-c7
+000008 000A D303                     out (h'03),a
+000009 000C                  
+000010 000C 3E00                     ld a,h'00
+000011 000E D301                     out (h'01),A
+000012 0010                  
+000013 0010 3E01                     ld a,h'01               ; lcd clear display
+000014 0012 CD9F01                   call cwrt
+000015 0015                  
+000016 0015 3E38                     ld a,h'38               ; lcd function set
+000017 0017 CD9F01                   call cwrt
+000018 001A                  
+000019 001A 3E0E                     ld a,h'0E               ; lcd display & cursor set
+000020 001C CD9F01                   call cwrt
+000021 001F                  
+000022 001F 3E06                     ld a,h'06               ; lcd entry mode set
+000023 0021 CD9F01                   call cwrt
+000024 0024                  
+000025 0024 1E00                     ld e, h'00              ; scroll counter
+000026 0026                  
+000027 0026                  
+000028 0026                  ; Init Ends ----------------------------------------------------------
+000029 0026                  
+000030 0026 CD8F02                   call titscr
+000031 0029 CD9A02                   call clrscr
+000032 002C                  
+000033 002C CD9A02           men1lp: call clrscr
+000034 002F DD212103                 ld ix, menu1            ; menu1: 1) keypad 2) port menu
+000035 0033 CDE701                   call print
+000036 0036                  
+000037 0036 CD1C02                   call kp
+000038 0039                  
+000039 0039 FE00                     cp h'00
+000040 003B CAB402                   jp z, documnt
+000041 003E                  
+000042 003E FE01                     cp h'01
+000043 0040 CA7A02                   jp z,kptest
+000044 0043                  
+000045 0043 FE02                     cp h'02
+000046 0045 C22C00                   jp nz,men1lp
+000047 0048                  
+000048 0048 CD9A02           men2lp: call clrscr
+000049 004B DD214103                 ld ix, menu2            ; menu2: port 1) A  2) C  3) D
+000050 004F CDE701                   call print
+000051 0052                  
+000052 0052 CD1C02                   call kp
+000053 0055                  
+000054 0055 FE01                     cp d'1
+000055 0057 CA6C00                   jp z,porta
+000056 005A                  
+000057 005A FE02                     cp d'2
+000058 005C CA7100                   jp z,portc
+000059 005F                  
+000060 005F FE03                     cp d'3
+000061 0061 CA7600                   jp z,portd
+000062 0064                  
+000063 0064 FE00                     cp d'0
+000064 0066 CA2C00                   jp z, men1lp
+000065 0069                  
+000066 0069 C34800                   jp men2lp
+000067 006C                  
+000068 006C 0E00             porta:  ld c, h'00
+000069 006E C37B00                   jp men3lp
+000070 0071 0E02             portc:  ld c, h'02
+000071 0073 C37B00                   jp men3lp
+000072 0076 0E03             portd:  ld c, h'03
+000073 0078 C37B00                   jp men3lp
+000074 007B                  
+000075 007B CD9A02           men3lp: call clrscr
+000076 007E DD216103                 ld ix, menu3            ; menu3: port 1) in  2) out
+000077 0082 CDE701                   call print
+000078 0085                  
+000079 0085 CD1C02                   call kp
+000080 0088                  
+000081 0088 FE01                     cp d'1
+000082 008A CA9A00                   jp z,prtin
+000083 008D                  
+000084 008D FE02                     cp d'2
+000085 008F CAEF00                   jp z,prtout
+000086 0092                  
+000087 0092 FE00                     cp d'0
+000088 0094 CA4800                   jp z, men2lp
+000089 0097                  
+000090 0097 C37B00                   jp men3lp
+000091 009A                  
+000092 009A                  
+000093 009A                  
+000094 009A CD9A02           prtin:  call clrscr
+000095 009D DD218103                 ld ix, prtinq           ; port reading program
+000096 00A1 CDE701                   call print
+000097 00A4 3E98                     ld a,b'10011000         ; 8255 a input, port c4-c7 input, mode 0
+000098 00A6 D303                     out (h'03),a
+000099 00A8 CDA402           pilp:   call crlf
+000100 00AB ED40                     in b,(c)
+000101 00AD CB78                     bit 7,b
+000102 00AF CDE000                   call digit
+000103 00B2 CB70                     bit 6,b
+000104 00B4 CDE000                   call digit
+000105 00B7 CB68                     bit 5,b
+000106 00B9 CDE000                   call digit
+000107 00BC CB60                     bit 4,b
+000108 00BE CDE000                   call digit
+000109 00C1 3E20                     ld a,' '
+000110 00C3 CDAE01                   call dwrt
+000111 00C6 CB58                     bit 3,b
+000112 00C8 CDE000                   call digit
+000113 00CB CB50                     bit 2,b
+000114 00CD CDE000                   call digit
+000115 00D0 CB48                     bit 1,b
+000116 00D2 CDE000                   call digit
+000117 00D5 CB40                     bit 0,b
+000118 00D7 CDE000                   call digit
+000119 00DA C3A800                   jp pilp
+000120 00DD C32C00                   jp men1lp
+000121 00E0                  
+000122 00E0 CAE900           digit:  jp z, zero
+000123 00E3 3E31                     ld a,'1'
+000124 00E5 CDAE01                   call dwrt
+000125 00E8 C9                       ret
+000126 00E9 3E30             zero:   ld a,'0'
+000127 00EB CDAE01                   call dwrt
+000128 00EE C9                       ret
+000129 00EF                  
+000130 00EF                  
+000131 00EF                  
+000132 00EF CD9A02           prtout: call clrscr
+000133 00F2 DD218F03                 ld ix, prtoutq          ; port writing program
+000134 00F6 CDE701                   call print
+000135 00F9 3E88                     ld a,b'10001000         ; 8255 port c4-c7 input, a output, mode 0
+000136 00FB D303                     out (h'03),a
+000137 00FD CDA402                   call crlf
+000138 0100 0600                     ld b, h'00              ; init as h'00
+000139 0102 CDA402           polp:   call crlf               ; show binary string
+000140 0105 ED41                     out (c),b
+000141 0107 CB78                     bit 7,b
+000142 0109 CDE000                   call digit
+000143 010C CB70                     bit 6,b
+000144 010E CDE000                   call digit
+000145 0111 CB68                     bit 5,b
+000146 0113 CDE000                   call digit
+000147 0116 CB60                     bit 4,b
+000148 0118 CDE000                   call digit
+000149 011B 3E20                     ld a,' '
+000150 011D CDAE01                   call dwrt
+000151 0120 CB58                     bit 3,b
+000152 0122 CDE000                   call digit
+000153 0125 CB50                     bit 2,b
+000154 0127 CDE000                   call digit
+000155 012A CB48                     bit 1,b
+000156 012C CDE000                   call digit
+000157 012F CB40                     bit 0,b
+000158 0131 CDE000                   call digit
+000159 0134 CD1C02           polp2:  call kp                 ; wait for a number
+000160 0137 FE00                     cp d'0                  ; escape menu
+000161 0139 CA2C00                   jp z, men1lp
+000162 013C FE08                     cp d'8                  ; alter bits
+000163 013E CA9801                   jp z, bit8
+000164 0141 FE07                     cp d'7
+000165 0143 CA9101                   jp z, bit7
+000166 0146 FE06                     cp d'6
+000167 0148 CA8A01                   jp z, bit6
+000168 014B FE05                     cp d'5
+000169 014D CA8301                   jp z, bit5
+000170 0150 FE04                     cp d'4
+000171 0152 CA7C01                   jp z, bit4
+000172 0155 FE03                     cp d'3
+000173 0157 CA7501                   jp z, bit3
+000174 015A FE02                     cp d'2
+000175 015C CA6E01                   jp z, bit2
+000176 015F FE01                     cp d'1
+000177 0161 CA6701                   jp z, bit1
+000178 0164 C33401                   jp polp2
+000179 0167 78               bit1:   ld a,b
+000180 0168 EE01                     xor h'01
+000181 016A 47                       ld b,a
+000182 016B C30201                   jp polp
+000183 016E 78               bit2:   ld a,b
+000184 016F EE02                     xor h'02
+000185 0171 47                       ld b,a
+000186 0172 C30201                   jp polp
+000187 0175 78               bit3:   ld a,b
+000188 0176 EE04                     xor h'04
+000189 0178 47                       ld b,a
+000190 0179 C30201                   jp polp
+000191 017C 78               bit4:   ld a,b
+000192 017D EE08                     xor h'08
+000193 017F 47                       ld b,a
+000194 0180 C30201                   jp polp
+000195 0183 78               bit5:   ld a,b
+000196 0184 EE10                     xor h'10
+000197 0186 47                       ld b,a
+000198 0187 C30201                   jp polp
+000199 018A 78               bit6:   ld a,b
+000200 018B EE20                     xor h'20
+000201 018D 47                       ld b,a
+000202 018E C30201                   jp polp
+000203 0191 78               bit7:   ld a,b
+000204 0192 EE40                     xor h'40
+000205 0194 47                       ld b,a
+000206 0195 C30201                   jp polp
+000207 0198 78               bit8:   ld a,b
+000208 0199 EE80                     xor h'80
+000209 019B 47                       ld b,a
+000210 019C C30201                   jp polp
+000211 019F                  
+000212 019F                  ; End of main routine   ----------------------------------------------
+000213 019F                  
+000214 019F                  
+000215 019F                  
+000216 019F F5               cwrt:   push af                 ; write control word in (a) to lcd
+000217 01A0 D301                     out (h'01),a            ; send (a) to b0-b7
+000218 01A2 3E01                     ld a,h'01               ; send %001 to c0-c3 (c0: E, c2: RE)
+000219 01A4 D302                     out (h'02),a
+000220 01A6 3E00                     ld a,h'00               ; send %000 to c0-c3
+000221 01A8 D302                     out (h'02),a
+000222 01AA D301                     out (h'01),a
+000223 01AC F1                       pop af
+000224 01AD C9                       ret
+000225 01AE                  
+000226 01AE                  
+000227 01AE                  
+000228 01AE F5               dwrt:   push af                 ; write data word in (a) to lcd
+000229 01AF D301                     out (h'01),a            ; & send (a) to b0-b7
+000230 01B1 3E05                     ld a,h'05               ; send %101 to c0-c3 (c0: E, c2: RE)
+000231 01B3 D302                     out (h'02),a
+000232 01B5 3E04                     ld a,h'04               ; send %100 to c0-c3
+000233 01B7 D302                     out (h'02),a
+000234 01B9 3E00                     ld a,h'00
+000235 01BB D301                     out (h'01),a
+000236 01BD D302                     out (h'02),a
+000237 01BF F1                       pop af
+000238 01C0 C9                       ret
+000239 01C1                  
+000240 01C1                  
+000241 01C1                  
+000242 01C1 F5               write:  push af                 ; write a string
+000243 01C2 DDE5                     push ix
+000244 01C4 DD7E00           sl1:    ld a,(IX+0)
+000245 01C7 FE24                     cp '$'                  ; $ is the end of string character
+000246 01C9 2808                     jr z,ex1
+000247 01CB CDAE01                   call dwrt
+000248 01CE DD23                     inc ix
+000249 01D0 C3C401                   jp sl1
+000250 01D3 DDE1             ex1:    pop ix
+000251 01D5 F1                       pop af
+000252 01D6 C9                       ret
+000253 01D7                  
+000254 01D7                  
+000255 01D7                  
+000256 01D7 F5               wait:   push af                 ; loop around (a) times
+000257 01D8 C5                       push bc
+000258 01D9 0600                     ld b, h'00
+000259 01DB B8               sl2:    cp b
+000260 01DC CAE401                   jp z, ex2
+000261 01DF 04                       inc b
+000262 01E0 00                       nop
+000263 01E1 C3DB01                   jp sl2
+000264 01E4 C1               ex2:    pop bc
+000265 01E5 F1                       pop af
+000266 01E6 C9                       ret
+000267 01E7                  
+000268 01E7                  
+000269 01E7                  
+000270 01E7 F5               print:  push af                 ; write a long string
+000271 01E8 C5                       push bc
+000272 01E9 DDE5                     push ix
+000273 01EB CD0602           pagelp: call wrln
+000274 01EE CDA402                   call crlf
+000275 01F1 CD0602                   call wrln
+000276 01F4 CDAC02                   call home
+000277 01F7 CD1C02                   call kp
+000278 01FA CD9A02                   call clrscr
+000279 01FD C3EB01                   jp pagelp
+000280 0200 F1               ex1b:   pop af
+000281 0201 DDE1                     pop ix
+000282 0203 C1                       pop bc
+000283 0204 F1                       pop af
+000284 0205 C9                       ret
+000285 0206 0610             wrln:   ld b,h'10
+000286 0208 DD7E00           sl1b:   ld a,(IX+0)
+000287 020B FE24                     cp '$'                  ; $ is the end of string character
+000288 020D 28F1                     jr z,ex1b
+000289 020F CDAE01                   call dwrt
+000290 0212 DD23                     inc ix
+000291 0214 05                       dec b
+000292 0215 CA1B02                   jp z,ex2b
+000293 0218 C30802                   jp sl1b
+000294 021B C9               ex2b:   ret
+000295 021C                  
+000296 021C                  
+000297 021C                  
+000298 021C C5               kp:     push bc                 ; returns # in a
+000299 021D DB02             rdkp1:  in a,(h'02)
+000300 021F E6F0                     and h'F0
+000301 0221 FEF0                     cp h'F0
+000302 0223 CA1D02                   jp z,rdkp1
+000303 0226 FEA0                     cp h'a0                 ; screen out * & #
+000304 0228 CA4302                   jp z,star
+000305 022B FEB0                     cp h'b0
+000306 022D CA5702                   jp z,num
+000307 0230 CB3F                     srl a                   ; change nibble
+000308 0232 CB3F                     srl a
+000309 0234 CB3F                     srl a
+000310 0236 CB3F                     srl a
+000311 0238 F5                       push af
+000312 0239 DB02             rdkp2:  in a,(h'02)             ; debouncing
+000313 023B FEF0                     cp h'f0
+000314 023D C23902                   jp nz,rdkp2
+000315 0240 F1                       pop af
+000316 0241 C1                       pop bc
+000317 0242 C9                       ret
+000318 0243 7B               star:   ld a,e
+000319 0244 FE00                     cp h'00
+000320 0246 CA1D02                   jp z,rdkp1
+000321 0249 1D                       dec e
+000322 024A 3E08                     ld a,h'08               ;delay
+000323 024C CDD701                   call wait
+000324 024F 3E1C                     ld a,h'1C               ;screen shift left
+000325 0251 CD9F01                   call cwrt
+000326 0254 C31D02                   jp rdkp1
+000327 0257 7B               num:    ld a,e
+000328 0258 FE18                     cp d'24
+000329 025A CA1D02                   jp z,rdkp1
+000330 025D 1C                       inc e
+000331 025E 3E08                     ld a,h'08               ;delay
+000332 0260 CDD701                   call wait
+000333 0263 3E18                     ld a,h'18               ;screen shift right
+000334 0265 CD9F01                   call cwrt
+000335 0268 C31D02                   jp rdkp1
+000336 026B                  
+000337 026B                  
+000338 026B                  
+000339 026B DDE5             pause:  push ix
+000340 026D DD211803                 ld ix, pauseq           ; print needs string addr in ix
+000341 0271 CDC101                   call write
+000342 0274 CD1C02                   call kp
+000343 0277 DDE1                     pop ix
+000344 0279 C9                       ret
+000345 027A                  
+000346 027A                  
+000347 027A                  
+000348 027A CD9A02           kptest: call clrscr
+000349 027D DD210A03                 ld ix, kpq              ; print needs string addr in ix
+000350 0281 CDC101                   call write
+000351 0284 CD1C02           kplp:   call kp
+000352 0287 C630                     add a,h'30              ; convert binary # to ascii
+000353 0289 CDAE01                   call dwrt
+000354 028C C38402                   jp kplp
+000355 028F                  
+000356 028F                  
+000357 028F                  
+000358 028F DD21C602         titscr: ld ix, title            ; print needs string addr in ix
+000359 0293 CDC101                   call write
+000360 0296 CD6B02                   call pause
+000361 0299 C9                       ret
+000362 029A                  
+000363 029A                  
+000364 029A                  
+000365 029A F5               clrscr: push af
+000366 029B 3E01                     ld a,h'01               ; lcd clear display
+000367 029D CD9F01                   call cwrt
+000368 02A0 1E00                     ld e,h'00
+000369 02A2 F1                       pop af
+000370 02A3 C9                       ret
+000371 02A4                  
+000372 02A4                  
+000373 02A4                  
+000374 02A4 F5               crlf:   push af
+000375 02A5 3EC0                     ld a,h'C0               ; lcd lf & cr
+000376 02A7 CD9F01                   call cwrt
+000377 02AA F1                       pop af
+000378 02AB C9                       ret
+000379 02AC                  
+000380 02AC                  
+000381 02AC                  
+000382 02AC F5               home:   push af
+000383 02AD 3E80                     ld a,h'80               ; lcd cursor home
+000384 02AF CD9F01                   call cwrt
+000385 02B2 F1                       pop af
+000386 02B3 C9                       ret
+000387 02B4                  
+000388 02B4                  
+000389 02B4                  
+000390 02B4 F5               documnt: push af
+000391 02B5 CD9A02                   call clrscr
+000392 02B8 DD21A003                 ld ix, docq
+000393 02BC CDE701                   call print
+000394 02BF CD6B02                   call pause
+000395 02C2 F1                       pop af
+000396 02C3 C32C00                   jp men1lp
+000397 02C6                  
+000398 02C6                  
+000399 02C6                  
+000400 02C6 5A38302036346B20 title:  .db "Z80 64k Circuit. Design & OS (c)1993 by Peter Ungsunan.            $"
+       02CE 436972637569742E
+       02D6 2044657369676E20
+       02DE 26204F5320286329
+       02E6 3139393320627920
+       02EE 506574657220556E
+       02F6 6773756E616E2E20
+       02FE 2020202020202020
+       0306 20202024        
+000401 030A 4B65797061642074 kpq:    .db "Keypad test: $"
+       0312 6573743A2024    
+000402 0318 2870617573656429 pauseq: .db "(paused)$"
+       0320 24              
+000403 0321 54657374733A2031 menu1:  .db "Tests: 1) keypad"
+       0329 29206B6579706164
+000404 0331 302920646F632032         .db "0) doc 2) ports$"
+       0339 2920706F72747324
+000405 0341 506F7274733A2020 menu2:  .db "Ports:   2) C   "
+       0349 2032292043202020
+000406 0351 2020312920412020         .db "  1) A   3) D  $"
+       0359 2033292044202024
+000407 0361 446972656374696F menu3:  .db "Direction:      "
+       0369 6E3A202020202020
+000408 0371 2020312920496E20         .db "  1) In  2) Out$"
+       0379 203229204F757424
+000409 0381 52656164696E6720 prtinq: .db "Reading port:$"
+       0389 706F72743A24    
+000410 038F 546F67676C652062 prtoutq: .db "Toggle bits 8-1:$"
+       0397 69747320382D313A
+       039F 24              
+000411 03A0 54686973206F7065 docq:   .db "This operating system is meant to provide a kernal of routines to support the IO from this computer device. "
+       03A8 726174696E672073
+       03B0 797374656D206973
+       03B8 206D65616E742074
+       03C0 6F2070726F766964
+       03C8 652061206B65726E
+       03D0 616C206F6620726F
+       03D8 7574696E65732074
+       03E0 6F20737570706F72
+       03E8 742074686520494F
+       03F0 2066726F6D207468
+       03F8 697320636F6D7075
+       0400 7465722064657669
+       0408 63652E20        
+000412 040C 494F206973206261         .db "IO is based around an 8255 PPI. The LCD uses port pins b0-b7, c0, and c2. The keypad, with an onboard EPROM "
+       0414 7365642061726F75
+       041C 6E6420616E203832
+       0424 3535205050492E20
+       042C 546865204C434420
+       0434 7573657320706F72
+       043C 742070696E732062
+       0444 302D62372C206330
+       044C 2C20616E64206332
+       0454 2E20546865206B65
+       045C 797061642C207769
+       0464 746820616E206F6E
+       046C 626F617264204550
+       0474 524F4D20        
+000413 0478 6B65796D61702C20         .db "keymap, uses c4-c7 of the PPI. The 8255 is based at control ports 00h-03h. Port A is freely available for "
+       0480 757365732063342D
+       0488 6337206F66207468
+       0490 65205050492E2054
+       0498 6865203832353520
+       04A0 6973206261736564
+       04A8 20617420636F6E74
+       04B0 726F6C20706F7274
+       04B8 73203030682D3033
+       04C0 682E20506F727420
+       04C8 4120697320667265
+       04D0 656C792061766169
+       04D8 6C61626C6520666F
+       04E0 7220            
+000414 04E2 616E79207573652E         .db "any use. Left and right LCD scrolling is availiable through * and # keys - Peter Ungsunan 1993. $"
+       04EA 204C65667420616E
+       04F2 6420726967687420
+       04FA 4C4344207363726F
+       0502 6C6C696E67206973
+       050A 20617661696C6961
+       0512 626C65207468726F
+       051A 756768202A20616E
+       0522 642023206B657973
+       052A 202D205065746572
+       0532 20556E6773756E61
+       053A 6E20313939332E20
+       0542 24              
+000415 0543                          .end
+BIT1    =0167  
+BIT2    =016E  
+BIT3    =0175  
+BIT4    =017C  
+BIT5    =0183  
+BIT6    =018A  
+BIT7    =0191  
+BIT8    =0198  
+CLRSCR  =029A  
+CRLF    =02A4  
+CWRT    =019F  
+DIGIT   =00E0  
+DOCQ    =03A0  
+DOCUMNT =02B4  
+DWRT    =01AE  
+EX1     =01D3  
+EX1B    =0200  
+EX2     =01E4  
+EX2B    =021B  
+HOME    =02AC  
+KP      =021C  
+KPLP    =0284  
+KPQ     =030A  
+KPTEST  =027A  
+MEN1LP  =002C  
+MEN2LP  =0048  
+MEN3LP  =007B  
+MENU1   =0321  
+MENU2   =0341  
+MENU3   =0361  
+NUM     =0257  
+PAGELP  =01EB  
+PAUSE   =026B  
+PAUSEQ  =0318  
+PILP    =00A8  
+POLP    =0102  
+POLP2   =0134  
+PORTA   =006C  
+PORTC   =0071  
+PORTD   =0076  
+PRINT   =01E7  
+PRTIN   =009A  
+PRTINQ  =0381  
+PRTOUT  =00EF  
+PRTOUTQ =038F  
+RDKP1   =021D  
+RDKP2   =0239  
+SL1     =01C4  
+SL1B    =0208  
+SL2     =01DB  
+STAR    =0243  
+START   =0000  
+TITLE   =02C6  
+TITSCR  =028F  
+WAIT    =01D7  
+WRITE   =01C1  
+WRLN    =0206  
+ZERO    =00E9  
+                                                                                                                                                                                                                         

@@ -1,0 +1,34 @@
+Text to Speech Processor:
+
+Date: 1989.
+ICs: SP0256-AL2, CTS256A-AL2.
+Pinout:
+
+        1 Not Connected
+        2 Not Connected
+        3 Rx Data
+        4 Not Connected
+        5 Ground
+        6 Not Connected
+        7 Not Connected
+        8 Not Connected
+        9 Not Connected
+
+Wiring:
+        Black   Ground
+        Red     +5v to +30v
+
+Indicators:
+        Red
+        Red
+
+Switches:
+        M/S     Reset
+
+        DIP:    1 \
+                2  >    RS232 Baud Select
+                3 /
+                4
+                5
+                6
+

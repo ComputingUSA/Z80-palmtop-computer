@@ -1,0 +1,188 @@
+000001 0000                          .org 0
+000002 0000 31FFFF           start:  ld sp, h'FFFF           ; stack at $ffff
+000003 0003                  
+000004 0003 3E88                     ld a,h'88               ; init 8255 to all output except a
+000005 0005 D303                     out (h'03),a
+000006 0007                  
+000007 0007 3E00                     ld a,h'00
+000008 0009 D301                     out (h'01),A
+000009 000B                  
+000010 000B 3E01                     ld a,h'01               ; lcd clear display
+000011 000D CD9900                   call cwrt
+000012 0010                  
+000013 0010 3E38                     ld a,h'38               ; lcd function set
+000014 0012 CD9900                   call cwrt
+000015 0015                  
+000016 0015 3E0F                     ld a,h'0F               ; lcd display & cursor set
+000017 0017 CD9900                   call cwrt
+000018 001A                  
+000019 001A 3E06                     ld a,h'06               ; lcd entry mode set
+000020 001C CD9900                   call cwrt
+000021 001F                  
+000022 001F                  ; Init Ends
+000023 001F                  
+000024 001F DD21F600                 ld ix, k                ; print needs string addr in ix
+000025 0023 CDBF00                   call print
+000026 0026                  
+000027 0026 3E40                     ld a, h'40              ; wait for 40 wait loops
+000028 0028 CDD500                   call wait
+000029 002B                  
+000030 002B 06FF                     ld b,h'FF
+000031 002D 3E10             loop1:  ld a, h'10              ; wait for 40 wait loops
+000032 002F CDD500                   call wait
+000033 0032                  
+000034 0032 3E8F                     ld a,h'8F               ; init 8255 to all output except a
+000035 0034 D303                     out (h'03),a
+000036 0036                  
+000037 0036 DB00                     in a,(h'00)
+000038 0038                  
+000039 0038 F5                       push af
+000040 0039 3E88                     ld a,h'88               ; init 8255 to all output except a
+000041 003B D303                     out (h'03),a
+000042 003D F1                       pop af
+000043 003E                  
+000044 003E E61F                      and h'1f
+000045 0040 B8                       cp b
+000046 0041 CA2D00                   jp z,loop1
+000047 0044 47                       ld b,a
+000048 0045 FE1F                     cp h'1F
+000049 0047 CC6600                   call z,a0
+000050 004A FE1E                     cp h'1E
+000051 004C CC6E00                   call z,a1
+000052 004F FE1D                     cp h'1D
+000053 0051 CC7600                   call z,a2
+000054 0054 FE1B                     cp h'1B
+000055 0056 CC7E00                   call z,a3
+000056 0059 FE17                     cp h'17
+000057 005B CC8600                   call z,a4
+000058 005E FE0F                     cp h'0F
+000059 0060 CC8E00                   call z,a5
+000060 0063 C32D00                   jp loop1
+000061 0066                  
+000062 0066 DD211501         a0:     ld ix, k0               ; "go"
+000063 006A CDBF00                   call print
+000064 006D C9                       ret
+000065 006E DD212501         a1:     ld ix, k1               ; "go"
+000066 0072 CDBF00                   call print
+000067 0075 C9                       ret
+000068 0076 DD212A01         a2:     ld ix, k2               ; "turn right"
+000069 007A CDBF00                   call print
+000070 007D C9                       ret
+000071 007E DD213701         a3:     ld ix, k3               ; "reverse"
+000072 0082 CDBF00                   call print
+000073 0085 C9                       ret
+000074 0086 DD214101         a4:     ld ix, k4               ; "stop"
+000075 008A CDBF00                   call print
+000076 008D C9                       ret
+000077 008E DD214801         a5:     ld ix, k5               ; "left turn"
+000078 0092 CDBF00                   call print
+000079 0095 C9                       ret
+000080 0096                  
+000081 0096 C30000           loop:   jp start                ; forever
+000082 0099                  
+000083 0099                  ; End of main routine   ----------------------------------------------
+000084 0099                  
+000085 0099                  
+000086 0099 F5               cwrt:   push af                 ; write control word in (a) to lcd
+000087 009A F5                       push af
+000088 009B 3E00                     ld a,h'00               ; send %000 to c0-c3
+000089 009D D302                     out (h'02),A
+000090 009F F1                       pop af                  ; restore A
+000091 00A0 D301                     out (h'01),a            ; & send it to b0-b7
+000092 00A2 3E01                     ld a,h'01               ; send %001 to c0-c3
+000093 00A4 D302                     out (h'02),a
+000094 00A6 3E00                     ld a,h'00               ; send %000 to c0-c3
+000095 00A8 D302                     out (h'02),a
+000096 00AA F1                       pop af
+000097 00AB C9                       ret
+000098 00AC                  
+000099 00AC F5               dwrt:   push af                 ; write control word in (a) to lcd
+000100 00AD F5                       push af
+000101 00AE 3E04                     ld a,h'04               ; send %100 to c0-c3
+000102 00B0 D302                     out (h'02),A
+000103 00B2 F1                       pop af                  ; restore A
+000104 00B3 D301                     out (h'01),a            ; & send it to b0-b7
+000105 00B5 3E05                     ld a,h'05               ; send %101 to c0-c3
+000106 00B7 D302                     out (h'02),a
+000107 00B9 3E04                     ld a,h'04               ; send %100 to c0-c3
+000108 00BB D302                     out (h'02),a
+000109 00BD F1                       pop af
+000110 00BE C9                       ret
+000111 00BF                  
+000112 00BF F5               print:  push af                 ; write a string
+000113 00C0 DDE5                     push ix
+000114 00C2 DD7E00           sl1:    ld a,(IX+0)
+000115 00C5 FE24                     cp '$'                  ; $ is the end of string character
+000116 00C7 2808                     jr z,ex1
+000117 00C9 CDAC00                   call dwrt
+000118 00CC DD23                     inc ix
+000119 00CE C3C200                   jp sl1
+000120 00D1 DDE1             ex1:    pop ix
+000121 00D3 F1                       pop af
+000122 00D4 C9                       ret
+000123 00D5                  
+000124 00D5 F5               wait:   push af                 ; loop around (a) times
+000125 00D6 C5                       push bc
+000126 00D7 0600                     ld b, h'00
+000127 00D9 B8               sl2:    cp b
+000128 00DA CAE200                   jp z, ex2
+000129 00DD 04                       inc b
+000130 00DE 00                       nop
+000131 00DF C3D900                   jp sl2
+000132 00E2 C1               ex2:    pop bc
+000133 00E3 F1                       pop af
+000134 00E4 C9                       ret
+000135 00E5                  
+000136 00E5 F5               monitr: push af
+000137 00E6 DD21F200                 ld ix, str1
+000138 00EA CDBF00                   call print
+000139 00ED F1                       pop af
+000140 00EE CDAC00                   call dwrt
+000141 00F1 C9                       ret
+000142 00F2                  
+000143 00F2 413A2024         str1:   .db "A: $"
+000144 00F6                  
+000145 00F6 5A38302054657374 k:      .db "Z80 Test, Peter Ungsunan 1993.$"
+       00FE 2C20506574657220
+       0106 556E6773756E616E
+       010E 20313939332E24  
+000146 0115 53617920736F6D65 k0:     .db "Say something. $"
+       011D 7468696E672E2024
+000147 0125 476F2E2024       k1:     .db "Go. $"
+000148 012A 5475726E20526967 k2:     .db "Turn Right. $"
+       0132 68742E2024      
+000149 0137 526576657273652E k3:     .db "Reverse. $"
+       013F 2024            
+000150 0141 53746F702E2024   k4:     .db "Stop. $"
+000151 0148 4C65667420547572 k5:     .db "Left Turn. $"
+       0150 6E2E2024        
+000152 0154 5465737420312024 t1:     .db "Test 1 $"
+000153 015C                          .end
+A0      =0066  
+A1      =006E  
+A2      =0076  
+A3      =007E  
+A4      =0086  
+A5      =008E  
+CWRT    =0099  
+DWRT    =00AC  
+EX1     =00D1  
+EX2     =00E2  
+K       =00F6  
+K0      =0115  
+K1      =0125  
+K2      =012A  
+K3      =0137  
+K4      =0141  
+K5      =0148  
+LOOP    =0096  
+LOOP1   =002D  
+MONITR  =00E5  
+PRINT   =00BF  
+SL1     =00C2  
+SL2     =00D9  
+START   =0000  
+STR1    =00F2  
+T1      =0154  
+WAIT    =00D5  
+                                                            nated  in   Can't find source file, enter new name  No debug info at program start, Run anyway No debug info, Run anyway No cod

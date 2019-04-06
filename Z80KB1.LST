@@ -1,0 +1,164 @@
+000001 0000                          .org 0
+000002 0000 31FFFF           start:  ld sp, h'FFFF           ; stack at $ffff
+000003 0003                  
+000004 0003 3E80                     ld a,h'80               ; init 8255 to all output
+000005 0005 D303                     out (h'03),a
+000006 0007                  
+000007 0007 3E00                     ld a,h'00
+000008 0009 D301                     out (h'01),A
+000009 000B                  
+000010 000B 3E01                     ld a,h'01               ; lcd clear display
+000011 000D CD9400                   call cwrt
+000012 0010                  
+000013 0010 3E38                     ld a,h'38               ; lcd function set
+000014 0012 CD9400                   call cwrt
+000015 0015                  
+000016 0015 3E0F                     ld a,h'0F               ; lcd display & cursor set
+000017 0017 CD9400                   call cwrt
+000018 001A                  
+000019 001A 3E06                     ld a,h'06               ; lcd entry mode set
+000020 001C CD9400                   call cwrt
+000021 001F                  
+000022 001F                  ; Init Ends
+000023 001F                  
+000024 001F DD21E000                 ld ix, init0            ; print needs string addr in ix
+000025 0023 CDBA00                   call print
+000026 0026                  
+000027 0026 3E8C             loop2:  ld a,h'8c               ; init 8255 to all output except a & c4-c7
+000028 0028 D303                     out (h'03),a
+000029 002A DB02                     in a,(h'02)
+000030 002C F5                       push af
+000031 002D 3E80                     ld a,h'80               ; init 8255 to all output
+000032 002F D303                     out (h'03),a
+000033 0031 F1                       pop af
+000034 0032 E6F0                     and h'F0
+000035 0034 CB3F                     srl a
+000036 0036 CB3F                     srl a
+000037 0038 CB3F                     srl a
+000038 003A CB3F                     srl a
+000039 003C FE0F                     cp h'0f
+000040 003E CA2600                   jp z,loop2
+000041 0041                          
+000042 0041 3E01                     ld a,h'01               ; lcd clear display
+000043 0043 CD9400                   call cwrt
+000044 0046                  
+000045 0046 DD212D01                 ld ix, init1            ; print needs string addr in ix
+000046 004A CDBA00                   call print
+000047 004D                  
+000048 004D 06FF                     ld b,h'FF
+000049 004F 3E8C             loop1:  ld a,h'8c               ; init 8255 to all output except a & c4-c7
+000050 0051 D303                     out (h'03),a
+000051 0053 DB02                     in a,(h'02)
+000052 0055 F5                       push af
+000053 0056 3E80                     ld a,h'80               ; init 8255 to all output
+000054 0058 D303                     out (h'03),a
+000055 005A F1                       pop af
+000056 005B E6F0                     and h'F0
+000057 005D CB3F                     srl a
+000058 005F CB3F                     srl a
+000059 0061 CB3F                     srl a
+000060 0063 CB3F                     srl a
+000061 0065 B8                       cp b
+000062 0066 CA4F00                   jp z,loop1
+000063 0069 47                       ld b,a
+000064 006A FE0F                     cp h'0f                 ; dont print if there's no key pressed
+000065 006C CA4F00                   jp z,loop1
+000066 006F FE0A                     cp h'0a
+000067 0071 CA8100                   jp z,star
+000068 0074 FE0B                     cp h'0b
+000069 0076 CA8900                   jp z,num
+000070 0079 C630                     add a,h'30
+000071 007B CDA700                   call dwrt
+000072 007E C34F00                   jp loop1
+000073 0081 3E2A             star:   ld a,'*'
+000074 0083 CDA700                   call dwrt
+000075 0086 C34F00                   jp loop1
+000076 0089 3E23             num:    ld a,'#'
+000077 008B CDA700                   call dwrt
+000078 008E C34F00                   jp loop1
+000079 0091                  
+000080 0091 C30000           loop:   jp start                ; forever
+000081 0094                  
+000082 0094                  ; End of main routine   ----------------------------------------------
+000083 0094                  
+000084 0094                  
+000085 0094 F5               cwrt:   push af                 ; write control word in (a) to lcd
+000086 0095 F5                       push af
+000087 0096 3E00                     ld a,h'00               ; send %000 to c0-c3
+000088 0098 D302                     out (h'02),A
+000089 009A F1                       pop af                  ; restore A
+000090 009B D301                     out (h'01),a            ; & send it to b0-b7
+000091 009D 3E01                     ld a,h'01               ; send %001 to c0-c3
+000092 009F D302                     out (h'02),a
+000093 00A1 3E00                     ld a,h'00               ; send %000 to c0-c3
+000094 00A3 D302                     out (h'02),a
+000095 00A5 F1                       pop af
+000096 00A6 C9                       ret
+000097 00A7                  
+000098 00A7 F5               dwrt:   push af                 ; write control word in (a) to lcd
+000099 00A8 F5                       push af
+000100 00A9 3E04                     ld a,h'04               ; send %100 to c0-c3
+000101 00AB D302                     out (h'02),A
+000102 00AD F1                       pop af                  ; restore A
+000103 00AE D301                     out (h'01),a            ; & send it to b0-b7
+000104 00B0 3E05                     ld a,h'05               ; send %101 to c0-c3
+000105 00B2 D302                     out (h'02),a
+000106 00B4 3E04                     ld a,h'04               ; send %100 to c0-c3
+000107 00B6 D302                     out (h'02),a
+000108 00B8 F1                       pop af
+000109 00B9 C9                       ret
+000110 00BA                  
+000111 00BA F5               print:  push af                 ; write a string
+000112 00BB DDE5                     push ix
+000113 00BD DD7E00           sl1:    ld a,(IX+0)
+000114 00C0 FE24                     cp '$'                  ; $ is the end of string character
+000115 00C2 2808                     jr z,ex1
+000116 00C4 CDA700                   call dwrt
+000117 00C7 DD23                     inc ix
+000118 00C9 C3BD00                   jp sl1
+000119 00CC DDE1             ex1:    pop ix
+000120 00CE F1                       pop af
+000121 00CF C9                       ret
+000122 00D0                  
+000123 00D0 F5               wait:   push af                 ; loop around (a) times
+000124 00D1 C5                       push bc
+000125 00D2 0600                     ld b, h'00
+000126 00D4 B8               sl2:    cp b
+000127 00D5 CADD00                   jp z, ex2
+000128 00D8 04                       inc b
+000129 00D9 00                       nop
+000130 00DA C3D400                   jp sl2
+000131 00DD C1               ex2:    pop bc
+000132 00DE F1                       pop af
+000133 00DF C9                       ret
+000134 00E0                  
+000135 00E0 5A38302036346B20 init0:  .db "Z80 64k Circuit. Designed & built by    Peter Ungsunan, 1993.       (paused)$"
+       00E8 436972637569742E
+       00F0 2044657369676E65
+       00F8 642026206275696C
+       0100 7420627920202020
+       0108 506574657220556E
+       0110 6773756E616E2C20
+       0118 313939332E202020
+       0120 2020202028706175
+       0128 7365642924      
+000136 012D 4B65797061642074 init1:  .db "Keypad test: $"
+       0135 6573743A2024    
+000137 013B                          .end
+CWRT    =0094  
+DWRT    =00A7  
+EX1     =00CC  
+EX2     =00DD  
+INIT0   =00E0  
+INIT1   =012D  
+LOOP    =0091  
+LOOP1   =004F  
+LOOP2   =0026  
+NUM     =0089  
+PRINT   =00BA  
+SL1     =00BD  
+SL2     =00D4  
+STAR    =0081  
+START   =0000  
+WAIT    =00D0  
+                                                    ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ
