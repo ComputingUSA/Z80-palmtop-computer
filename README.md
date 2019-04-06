@@ -10,3 +10,5 @@ I also burned 2 applications on to the EPROM: one to read I/O control lines and 
 Input was via a membrane numeric keypad mapped through another EPROM, and output was to a 2 column LCD display based on a standard Hitachi chipset.
 
 This includes the source code and binaries to the small operating system I wrote and EPROM image of the keyboard encoder I designed.
+
+"Z80OS2.ASM" is the main OS image I wrote back then :)
