@@ -6,7 +6,7 @@ KBENCODR.ROM is the ROM mapping for the keyboard circuit.
 The TXT files are just pinouts for the chips I needed to build the computer circuits.
 JMCO0793.WKS is a Lotus 1-2-3 clone spreadsheet for the parts order from Jameco. The Z80 microprocessor cost only $1.49, and I could barely even afford that back then.
 
-I used a z80 MCU + static RAM + EPROM to contain the operating system that I wrote. I also based the keyboard circuit on another EPROM and LCD was connected using the serial interface using it's Hitachi chipset to the Intel 8255 PPI. Input was via a membrane numeric keypad and output was to a 2 column LCD display.
+I used a Z80 MCU + static RAM + EPROM to contain the operating system that I wrote. I also based the keyboard circuit on another EPROM and LCD was connected using the serial interface using it's Hitachi chipset to the Intel 8255 PPI. Input was via a membrane numeric keypad and output was to a 2 column LCD display.
 
 I wrote the operating system in Z80 Assembler and I designed it in a way similar to how PC operating systems were written at the time, using establised subroutines to handle basic input and output (a BIOS). I used the a80z Z80 cross-assembler and uploaded the object file to a Jameco EPROM programmer.
 
