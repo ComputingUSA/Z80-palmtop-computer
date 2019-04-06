@@ -1,4 +1,4 @@
-Here is the code for a Zilog z80 based palm-top computer I designed and built back in 1993 for around $50.
+Here is the code for a Zilog Z80 based palm-top computer I designed and built back in 1993 for around $50.
 I designed and built it because I wanted a portable computer, but since I was just a student studying electrical engineering, I couldn't afford to buy one :)
 
 "Z80OS2.ASM" is my main OS image :)
