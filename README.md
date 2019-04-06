@@ -15,3 +15,36 @@ I also burned 2 applications on to the EPROM: one to read/write I/O control line
 This includes the source code and binaries to the small operating system I wrote and EPROM image of the keyboard encoder I designed.
 
 The built-in help screen says: "This operating system is meant to provide a kernal of routines to support the IO from this computer device. IO is based around an 8255 PPI. The LCD uses port pins b0-b7, c0, and c2. The keypad, with an onboard EPROM keymap, uses c4-c7 of the PPI. The 8255 is based at control ports 00h-03h. Port A is freely available for any use. Left and right LCD scrolling is availiable through * and # keys - Peter Ungsunan 1993. "
+
+
+Z80 CPU Board:
+
+Date: 01/08/93.
+ICs: Z80 CPU, 6116, 2716. 7805 Voltage Regulator on Board.
+External Bus Pinout:
+
+        1 Ground         2 +5v
+        3 D0             4 D1
+        5 D2             6 D3
+        7 D4             8 D5
+        9 D6            10 D7
+       11 -WR           12 -RD
+       13 -MEMRQ        14 -IORQ
+       15 -INT          16 A0
+       17 A1            18 A2
+       19 A3            20 A4
+       21 A5            22 A6
+       23 A7            24 A8
+       25 A9            26 A10
+[(-) before a pin function means negative logic.]
+
+Memory Map:
+
+        0000-07FF       2716 EPROM
+        0800-0FFF       6116 Static RAM
+
+Switches:
+        Monomentary On  Reset
+
+Indicators:
+        Red     Power
