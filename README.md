@@ -1,4 +1,5 @@
-Here is the code for a z80 based palm-top computer I designed and built back in 1993 because I wanted a portable computer and couldn't afford the ones in the magazines since I was just a student studying electrical engineering :)
+Here is the code for a Zilog z80 based palm-top computer I designed and built back in 1993 for around $50.
+I designed and built it because I wanted a portable computer, but since I was just a student studying electrical engineering, I couldn't afford to buy one :)
 
 "Z80OS2.ASM" is my main OS image :)
 KBENCODR.ROM is the ROM mapping for the keyboard circuit.
