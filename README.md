@@ -1,4 +1,4 @@
-Here is the code for a z80 based palm-top computer I designed and built back in 1993.
+Here is the code for a z80 based palm-top computer I designed and built back in 1993 because I wanted a portable computer and couldn't afford the ones in the magazines :)
 
 "Z80OS2.ASM" is my main OS image :)
 KBENCODR.ROM is the ROM mapping for the keyboard circuit.
